@@ -125,4 +125,55 @@ func TestCreateDirectory(t *testing.T) {
 }
 
 // TestIsDirectoryExists checks that IsDirectoryExists returns true for directories,
-// and false for files or non-existent paths.
+// and false for files or non-existent paths
+
+func TestFindTemplateFiles(t *testing.T) {
+	// Create a temporary directory.
+	tempDir, err := os.MkdirTemp("", "TestFindTemplateFiles")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Clean up the temporary directory after the test.
+	defer os.RemoveAll(tempDir)
+
+	// Create test files.
+	// Files that should match the pattern.
+	file1 := filepath.Join(tempDir, "template1.tmpl")
+	file3 := filepath.Join(tempDir, "template3.tmpl")
+	// A file that should not match.
+	file2 := filepath.Join(tempDir, "template2.txt")
+
+	// Write contents to the files.
+	if err := os.WriteFile(file1, []byte("content1"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(file2, []byte("content2"), 0644); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(file3, []byte("content3"), 0644); err != nil {
+		t.Fatal(err)
+	}
+
+	// Use the function to search for files containing "tmpl" in their names.
+	foundFiles, err := FindTemplateFiles(tempDir, "tmpl")
+	if err != nil {
+		t.Fatalf("expected no error, got %v", err)
+	}
+
+	// We expect only file1 and file3 to be returned.
+	expectedFiles := map[string]bool{
+		file1: true,
+		file3: true,
+	}
+
+	if len(foundFiles) != len(expectedFiles) {
+		t.Fatalf("expected %d files, got %d", len(expectedFiles), len(foundFiles))
+	}
+
+	// Verify that each expected file is in the result.
+	for _, file := range foundFiles {
+		if !expectedFiles[file] {
+			t.Errorf("unexpected file found: %s", file)
+		}
+	}
+}

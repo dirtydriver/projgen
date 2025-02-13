@@ -2,8 +2,10 @@ package filescheck
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func FilesInDirectories(dir string) ([]string, error) {
@@ -36,6 +38,28 @@ func CopyFiles(files []string, targetDir string) error {
 
 	}
 	return nil
+}
+
+func FindTemplateFiles(path string, pattern string) ([]string, error) {
+	var files []string
+	err := filepath.Walk(path, func(path string, info fs.FileInfo, err error) error {
+
+		if err != nil {
+			return err
+		}
+
+		if !info.IsDir() && strings.Contains(info.Name(), pattern) {
+			files = append(files, path)
+		}
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return files, nil
+
 }
 
 func CreateDirectory(dirName string) error {
