@@ -8,6 +8,7 @@
 *.so
 *.dylib
 bin/
+templates_test_files/
 # Test binary, built with `go test -c`
 *.test
 

@@ -3,7 +3,7 @@
 # Variables
 BINARY_NAME := projgen
 BUILD_DIR   := bin
-SRC         := ./cmd/main.go
+SRC         := ./main.go
 
 # Ensure these targets are always executed even if a file with the same name exists
 .PHONY: all build run test fmt lint vet deps clean
