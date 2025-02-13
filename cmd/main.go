@@ -1,7 +1,9 @@
 package main
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"log"
 	"os"
 	"path/filepath"
@@ -21,12 +23,24 @@ func filesInDirectories(dir string) ([]string, error) {
 }
 
 func isDirectoryExists(path string) bool {
+	_, err := os.Stat(path)
+
+	if err == nil {
+		return true
+	}
+
+	if errors.Is(err, fs.ErrNotExist) {
+		return false
+	}
+
+	return false
 
 }
 
 func main() {
 
-	entries, err := filesInDirectories("/mnt/f/Progproject/GO")
+	entries, err := filesInDirectories(".")
+	fmt.Println(isDirectoryExists("cmd"))
 	fmt.Println(entries)
 	if err != nil {
 		log.Fatalf("Something went wrong: %s", err)
