@@ -6,18 +6,9 @@ import (
 	"sync"
 	"text/template"
 	"text/template/parse"
+
+	"github.com/dirtydriver/projgen/utils"
 )
-
-var uniqCheck map[string]bool
-var uniqElements []string
-
-func addElement(e string) {
-	if uniqCheck[e] {
-		return
-	}
-	uniqElements = append(uniqElements, e)
-	uniqCheck[e] = true
-}
 
 func collectPlaceholders(node parse.Node, placeholders map[string]struct{}) {
 	switch n := node.(type) {
@@ -96,6 +87,6 @@ func CollectParameters(tempFiles []string) ([]string, error) {
 		placeholderList = append(placeholderList, param)
 	}
 
-	return placeholderList, nil
+	return utils.RemoveDuplicates(placeholderList), nil
 
 }
