@@ -1,6 +1,7 @@
 package templater
 
 import (
+	"bytes"
 	"fmt"
 	"strings"
 	"sync"
@@ -89,4 +90,24 @@ func CollectParameters(tempFiles []string) ([]string, error) {
 
 	return utils.RemoveDuplicates(placeholderList), nil
 
+}
+
+func RenderTemplate(file string, params map[string]string) (bytes.Buffer, error) {
+	// Parse the template file
+	tmpl, err := template.ParseFiles(file)
+	if err != nil {
+		return bytes.Buffer{}, err // Return the error immediately
+	}
+
+	// Create a buffer to store the rendered output
+	var output bytes.Buffer
+
+	// Execute the template with the provided parameters
+	err = tmpl.Execute(&output, params)
+	if err != nil {
+		return bytes.Buffer{}, err
+	}
+
+	// Return the rendered template as a string
+	return output, nil
 }

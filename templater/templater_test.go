@@ -94,3 +94,44 @@ func TestCollectParametersInvalidTemplate(t *testing.T) {
 		t.Errorf("Expected no parameters for invalid template, got %v", params)
 	}
 }
+
+func TestRenderTemplate(t *testing.T) {
+	// Define the template content.
+	templateContent := "Hello, {{.Name}}! Welcome to {{.Project}}."
+
+	// Create a temporary file for the template.
+	tmpFile, err := os.CreateTemp("", "template-*.txt")
+	if err != nil {
+		t.Fatalf("failed to create temporary file: %v", err)
+	}
+	// Ensure the temporary file is removed after the test.
+	defer os.Remove(tmpFile.Name())
+
+	// Write the template content to the file.
+	if _, err := tmpFile.WriteString(templateContent); err != nil {
+		t.Fatalf("failed to write to temporary file: %v", err)
+	}
+	// Close the file so it can be read by RenderTemplate.
+	if err := tmpFile.Close(); err != nil {
+		t.Fatalf("failed to close temporary file: %v", err)
+	}
+
+	// Prepare the parameters to pass to the template.
+	params := map[string]string{
+		"Name":    "John",
+		"Project": "Go Testing",
+	}
+
+	// Call RenderTemplate with the temporary template file.
+	output, err := RenderTemplate(tmpFile.Name(), params)
+	if err != nil {
+		t.Fatalf("RenderTemplate returned an error: %v", err)
+	}
+
+	// Define the expected output.
+	expected := "Hello, John! Welcome to Go Testing."
+	// Compare the rendered output with the expected result.
+	if output.String() != expected {
+		t.Errorf("expected output %q, got %q", expected, output.String())
+	}
+}
