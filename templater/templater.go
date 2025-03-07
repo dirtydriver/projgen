@@ -33,7 +33,7 @@ func collectPlaceholders(node parse.Node, placeholders map[string]struct{}) {
 	case *parse.FieldNode:
 		// FieldNode represents expressions like {{ .GroupID }}
 		// The Ident slice contains the field names, which we join with dots.
-		placeholder := "." + strings.Join(n.Ident, ".")
+		placeholder := strings.Join(n.Ident, ".")
 		placeholders[placeholder] = struct{}{}
 	case *parse.ChainNode:
 		// ChainNode represents chained accesses like {{ .User.Name }}
