@@ -1,12 +1,53 @@
 package filescheck
 
 import (
+	"bufio"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 )
+
+func ReadParamsFromFile(paramFilePath string, paramsMap *map[string]interface{}) error {
+	file, err := os.Open(paramFilePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	lineNumber := 0
+
+	for scanner.Scan() {
+		lineNumber++
+		line := strings.TrimSpace(scanner.Text())
+
+		// Skip empty lines or lines starting with a comment marker
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) != 2 {
+			return fmt.Errorf("invalid parameter format on line %d: %s. Expected key=value", lineNumber, line)
+		}
+
+		key := strings.TrimSpace(parts[0])
+		value := strings.TrimSpace(parts[1])
+
+		if _, exists := (*paramsMap)[key]; !exists {
+			(*paramsMap)[key] = value
+		}
+
+	}
+
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+
+	return nil
+}
 
 func FilesInDirectories(dir string) ([]string, error) {
 	var files []string
