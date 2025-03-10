@@ -3,6 +3,8 @@ package templater
 import (
 	"bytes"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 	"sync"
 	"text/template"
@@ -92,7 +94,7 @@ func CollectParameters(tempFiles []string) ([]string, error) {
 
 }
 
-func RenderTemplate(file string, params map[string]string) (bytes.Buffer, error) {
+func RenderTemplate(file string, params map[string]interface{}) (bytes.Buffer, error) {
 	// Parse the template file
 	tmpl, err := template.ParseFiles(file)
 	if err != nil {
@@ -110,4 +112,40 @@ func RenderTemplate(file string, params map[string]string) (bytes.Buffer, error)
 
 	// Return the rendered template as a string
 	return output, nil
+}
+
+func IsTemplate(path string) bool {
+
+	templ := filepath.Ext(path)
+
+	if strings.Contains(templ, ".tmpl") {
+		return true
+	} else {
+		return false
+	}
+
+}
+
+func WriteTemplate(path string, renderedTemplate *bytes.Buffer) error {
+
+	file, err := os.Create(path)
+
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if cerr := file.Close(); cerr != nil {
+			if err != nil {
+				err = fmt.Errorf("write error: %v; additionally, close error: %v", err, cerr)
+			} else {
+				err = cerr
+			}
+		}
+	}()
+
+	if _, err := renderedTemplate.WriteTo(file); err != nil {
+		return err
+	}
+	return nil
 }

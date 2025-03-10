@@ -1,18 +1,27 @@
 package cmd
 
 import (
+	"fmt"
+	"log"
 	"os"
+	"path"
+	"strings"
 
+	"github.com/dirtydriver/projgen/filescheck"
+	"github.com/dirtydriver/projgen/project"
+	"github.com/dirtydriver/projgen/templater"
 	"github.com/spf13/cobra"
 )
 
 var (
-	projectType  string
-	projectName  string
-	outputDir    string
-	parameters   []string
-	getTemplate  bool
-	templateFile string
+	projectType    string
+	projectName    string
+	outputDir      string
+	parameters     []string
+	getTemplate    bool
+	templateFile   string
+	templateDir    string
+	parametersFile string
 )
 
 func getRootCmd() *cobra.Command {
@@ -22,14 +31,21 @@ func getRootCmd() *cobra.Command {
 		Short: "Project generator that renders project skeletons from templates",
 		Run: func(cmd *cobra.Command, args []string) {
 			// If user wants to see the expected template parameters.
-			/* 	if getTemplate {
-				if templateFile == "" {
-					log.Fatal("Please provide a template file using --template-file")
+			if getTemplate {
+				if projectType == "" && templateDir == "" {
+					log.Fatal("Please provide a project type and template directory")
 				}
-				params, err := project.ExtractTemplateParams(templateFile)
+				templatePath := path.Join(templateDir, projectType)
+				files, err := filescheck.FindTemplateFiles(templatePath, "tmpl")
 				if err != nil {
-					log.Fatalf("Error extracting template parameters: %v", err)
+					log.Fatalf("Error collection template files: %v", err)
 				}
+
+				params, err := templater.CollectParameters(files)
+				if err != nil {
+					log.Fatalf(err.Error())
+				}
+
 				fmt.Println("Template requires the following parameters:")
 				for _, p := range params {
 					fmt.Println(" -", p)
@@ -48,24 +64,33 @@ func getRootCmd() *cobra.Command {
 				paramsMap[key] = value
 			}
 
+			if parametersFile != "" {
+				if err := filescheck.ReadParamsFromFile(parametersFile, &paramsMap); err != nil {
+					log.Fatal(err.Error())
+				}
+			}
+
+			_, NameExists := paramsMap["name"]
+			_, TypeExists := paramsMap["type"]
+
 			// Optionally, you can also merge explicit flags (like projectType or projectName)
 			// into the parameters map if you want them to be available in the template.
-			if projectName != "" {
-				paramsMap["ProjectName"] = projectName
+			if projectName != "" && !NameExists {
+				paramsMap["name"] = projectName
 			}
-			if projectType != "" {
-				paramsMap["ProjectType"] = projectType
+			if projectType != "" && !TypeExists {
+				paramsMap["type"] = projectType
 			}
 
 			// Proceed with generating the project using the merged parameters.
-			if projectType == "" || projectName == "" {
+			if projectType == "" && !NameExists || projectName == "" && !TypeExists {
 				log.Fatal("Project type and project name are required")
 			}
-			err := project.Generate(projectType, projectName, outputDir, paramsMap)
+			err := project.Generate(templateDir, outputDir, paramsMap)
 			if err != nil {
 				log.Fatalf("Error generating project: %v", err)
 			}
-			fmt.Println("Project generated successfully!") */
+			fmt.Println("Project generated successfully!")
 		},
 	}
 
@@ -79,7 +104,9 @@ func getRootCmd() *cobra.Command {
 
 	// Flags to list expected template parameters.
 	rootCmd.Flags().BoolVar(&getTemplate, "get-template-params", false, "List the parameters required by the template")
+	rootCmd.Flags().StringVar(&templateDir, "template-dir", "", "Path to the template directory")
 	rootCmd.Flags().StringVar(&templateFile, "template-file", "", "Path to the template file to inspect")
+	rootCmd.Flags().StringVar(&parametersFile, "file", "f", "Path to the parameters file to inspect")
 
 	return rootCmd
 }
