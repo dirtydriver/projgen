@@ -98,6 +98,7 @@ func getRootCmd() *cobra.Command {
 	rootCmd.Flags().StringVarP(&projectType, "type", "t", "", "Type of project (e.g. maven, gradle, angular)")
 	rootCmd.Flags().StringVarP(&projectName, "name", "n", "", "Name of the project")
 	rootCmd.Flags().StringVarP(&outputDir, "out", "o", ".", "Output directory")
+	rootCmd.Flags().StringVarP(&parametersFile, "file", "f", "", "Path to the parameters file to inspect")
 
 	// Parameter flags: allow multiple values.
 	rootCmd.Flags().StringArrayVarP(&parameters, "parameter", "p", []string{}, "Additional parameters in key=value format")
@@ -106,15 +107,18 @@ func getRootCmd() *cobra.Command {
 	rootCmd.Flags().BoolVar(&getTemplate, "get-template-params", false, "List the parameters required by the template")
 	rootCmd.Flags().StringVar(&templateDir, "template-dir", "", "Path to the template directory")
 	rootCmd.Flags().StringVar(&templateFile, "template-file", "", "Path to the template file to inspect")
-	rootCmd.Flags().StringVar(&parametersFile, "file", "f", "Path to the parameters file to inspect")
 
 	return rootCmd
 }
 
 func RunRootCmd() {
-
-	if err := getRootCmd().Execute(); err != nil {
+	rootCmd := getRootCmd()
+	if len(os.Args) < 2 {
+		// Print help and exit if no flags or arguments are provided.
+		_ = rootCmd.Help()
+		os.Exit(0)
+	}
+	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
-
 }

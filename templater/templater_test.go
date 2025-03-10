@@ -1,6 +1,8 @@
 package templater
 
 import (
+	"bytes"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -117,7 +119,7 @@ func TestRenderTemplate(t *testing.T) {
 	}
 
 	// Prepare the parameters to pass to the template.
-	params := map[string]string{
+	params := map[string]interface{}{
 		"Name":    "John",
 		"Project": "Go Testing",
 	}
@@ -133,5 +135,73 @@ func TestRenderTemplate(t *testing.T) {
 	// Compare the rendered output with the expected result.
 	if output.String() != expected {
 		t.Errorf("expected output %q, got %q", expected, output.String())
+	}
+}
+
+// Test for IsTemplate function.
+func TestIsTemplate(t *testing.T) {
+	tests := []struct {
+		path     string
+		expected bool
+	}{
+		{"foo.tmpl", true},
+		{"foo.html.tmpl", true},
+		{"foo.txt", false},
+		{"foo", false},
+		// In this case, the final extension is ".txt" so IsTemplate returns false.
+		{"foo.tmpl.txt", false},
+	}
+
+	for _, tt := range tests {
+		result := IsTemplate(tt.path)
+		if result != tt.expected {
+			t.Errorf("IsTemplate(%q) = %v, want %v", tt.path, result, tt.expected)
+		}
+	}
+}
+
+// Test for WriteTemplate to ensure successful file creation and content write.
+func TestWriteTemplate_Success(t *testing.T) {
+	// Create a temporary directory.
+	tempDir, err := ioutil.TempDir("", "test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	filePath := filepath.Join(tempDir, "test.tmpl")
+	content := "Hello, template!"
+	buf := bytes.NewBufferString(content)
+
+	err = WriteTemplate(filePath, buf)
+	if err != nil {
+		t.Fatalf("WriteTemplate failed: %v", err)
+	}
+
+	data, err := os.ReadFile(filePath)
+	if err != nil {
+		t.Fatalf("ReadFile failed: %v", err)
+	}
+	if string(data) != content {
+		t.Errorf("File content = %q, want %q", string(data), content)
+	}
+}
+
+// Test for WriteTemplate error when trying to write to a directory.
+func TestWriteTemplate_Error(t *testing.T) {
+	// Create a temporary directory.
+	tempDir, err := os.MkdirTemp("", "test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	// Passing the directory as the file path should produce an error.
+	content := "Hello, template!"
+	buf := bytes.NewBufferString(content)
+
+	err = WriteTemplate(tempDir, buf)
+	if err == nil {
+		t.Errorf("Expected error when writing to a directory, got nil")
 	}
 }

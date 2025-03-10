@@ -65,18 +65,15 @@ func FilesInDirectories(dir string) ([]string, error) {
 
 }
 
-func CopyFiles(files []string, targetDir string) error {
+func CopyFile(file string, targetDir string) error {
 
-	for _, file := range files {
-		input, err := os.ReadFile(file)
-		if err != nil {
-			return fmt.Errorf("reading file %q: %w", file, err)
-		}
-		destPath := filepath.Join(targetDir, filepath.Base(file))
-		if err := os.WriteFile(destPath, input, 0644); err != nil {
-			return err
-		}
-
+	input, err := os.ReadFile(file)
+	if err != nil {
+		return fmt.Errorf("reading file %q: %w", file, err)
+	}
+	destPath := filepath.Join(targetDir, filepath.Base(file))
+	if err := os.WriteFile(destPath, input, 0644); err != nil {
+		return err
 	}
 	return nil
 }

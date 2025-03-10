@@ -9,6 +9,7 @@
 *.dylib
 bin/
 templates_test_files/
+.vscode/
 # Test binary, built with `go test -c`
 *.test
 
