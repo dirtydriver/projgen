@@ -9,6 +9,8 @@ import (
 	"strings"
 )
 
+// ReadParamsFromFile reads parameters from a file and updates the provided parameters map.
+// It expects parameters in key=value format, ignoring empty lines and comments starting with #.
 func ReadParamsFromFile(paramFilePath string, paramsMap *map[string]interface{}) error {
 	file, err := os.Open(paramFilePath)
 	if err != nil {
@@ -49,6 +51,7 @@ func ReadParamsFromFile(paramFilePath string, paramsMap *map[string]interface{})
 	return nil
 }
 
+// FilesInDirectories returns a list of all files (non-directories) in the specified directory and its subdirectories.
 func FilesInDirectories(dir string) ([]string, error) {
 	var files []string
 	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
@@ -65,6 +68,7 @@ func FilesInDirectories(dir string) ([]string, error) {
 
 }
 
+// CopyFile copies a file from the source path to the target directory.
 func CopyFile(file string, targetDir string) error {
 
 	input, err := os.ReadFile(file)
@@ -78,6 +82,7 @@ func CopyFile(file string, targetDir string) error {
 	return nil
 }
 
+// FindTemplateFiles searches for files containing the specified pattern in their name within the given path.
 func FindTemplateFiles(path string, pattern string) ([]string, error) {
 	var files []string
 	err := filepath.Walk(path, func(path string, info fs.FileInfo, err error) error {
@@ -100,6 +105,7 @@ func FindTemplateFiles(path string, pattern string) ([]string, error) {
 
 }
 
+// CreateDirectory creates a new directory at the specified path if it doesn't already exist.
 func CreateDirectory(dirName string) error {
 	if info, err := os.Stat(dirName); err == nil {
 		if info.IsDir() {
@@ -116,6 +122,7 @@ func CreateDirectory(dirName string) error {
 	return os.MkdirAll(dirName, os.ModePerm)
 }
 
+// IsDirectoryExists checks if a directory exists at the specified path.
 func IsDirectoryExists(path string) bool {
 	info, err := os.Stat(path)
 	if err != nil {

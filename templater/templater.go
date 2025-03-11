@@ -53,6 +53,8 @@ func collectPlaceholders(node parse.Node, placeholders map[string]struct{}) {
 	}
 }
 
+// CollectParameters analyzes template files and returns a list of unique parameter names used in them.
+// It processes templates concurrently for better performance.
 func CollectParameters(tempFiles []string) ([]string, error) {
 
 	var (
@@ -94,6 +96,7 @@ func CollectParameters(tempFiles []string) ([]string, error) {
 
 }
 
+// RenderTemplate processes a template file with the given parameters and returns the rendered content.
 func RenderTemplate(file string, params map[string]interface{}) (bytes.Buffer, error) {
 	// Parse the template file
 	tmpl, err := template.ParseFiles(file)
@@ -114,18 +117,12 @@ func RenderTemplate(file string, params map[string]interface{}) (bytes.Buffer, e
 	return output, nil
 }
 
+// IsTemplate checks if a file is a template by verifying if it has a .tmpl extension.
 func IsTemplate(path string) bool {
-
-	templ := filepath.Ext(path)
-
-	if strings.Contains(templ, ".tmpl") {
-		return true
-	} else {
-		return false
-	}
-
+	return strings.Contains(filepath.Ext(path), ".tmpl")
 }
 
+// WriteTemplate writes the rendered template content to the specified file path.
 func WriteTemplate(path string, renderedTemplate *bytes.Buffer) error {
 
 	file, err := os.Create(path)

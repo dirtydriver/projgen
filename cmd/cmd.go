@@ -111,6 +111,9 @@ func getRootCmd() *cobra.Command {
 	return rootCmd
 }
 
+// RunRootCmd executes the root command of the RepoForge CLI tool.
+// If no arguments are provided, it displays the help information.
+// The function handles command execution and exits with an error if the command fails.
 func RunRootCmd() {
 	rootCmd := getRootCmd()
 	if len(os.Args) < 2 {

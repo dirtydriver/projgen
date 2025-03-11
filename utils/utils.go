@@ -5,6 +5,7 @@ import (
 	"slices"
 )
 
+// RemoveDuplicates returns a new slice containing unique elements from the input slice.
 func RemoveDuplicates(list []string) []string {
 	uniqCheck := make(map[string]bool)
 	var uniqElements []string
@@ -19,6 +20,7 @@ func RemoveDuplicates(list []string) []string {
 	return uniqElements
 }
 
+// ValidateParameters checks if two parameter lists contain the same elements (order-independent).
 func ValidateParameters(ParamList, TemplateParamList *[]string) bool {
 
 	slices.Sort(*ParamList)
@@ -27,6 +29,7 @@ func ValidateParameters(ParamList, TemplateParamList *[]string) bool {
 	return reflect.DeepEqual(*ParamList, *TemplateParamList)
 }
 
+// CollectMissingParameters returns a slice of parameters that are in TemplateParamList but not in ParamList.
 func CollectMissingParameters(ParamList, TemplateParamList *[]string) []string {
 
 	var missingParams []string

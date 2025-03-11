@@ -11,6 +11,8 @@ import (
 	"github.com/dirtydriver/projgen/templater"
 )
 
+// Generate creates a new project from a template directory using the provided parameters.
+// It copies all files from the template, rendering any .tmpl files with the given parameters.
 func Generate(templateDir, outputDir string, paramsMap map[string]interface{}) error {
 	// Validate and extract the project type.
 	projectTypeVal, ok := paramsMap["type"]
