@@ -42,3 +42,60 @@ func TestRemoveDuplicates(t *testing.T) {
 		})
 	}
 }
+
+func TestCheckMissingKeys(t *testing.T) {
+	t.Run("some missing keys", func(t *testing.T) {
+		m := map[string]interface{}{
+			"apple":  1,
+			"banana": 2,
+		}
+		keys := []string{"apple", "banana", "cherry", "date"}
+		err := CheckMissingKeys(m, keys)
+		if err == nil {
+			t.Error("expected an error for missing keys, got nil")
+		} else {
+			expectedErr := "missing keys: cherry, date"
+			if err.Error() != expectedErr {
+				t.Errorf("expected error '%s', got '%s'", expectedErr, err.Error())
+			}
+		}
+	})
+
+	t.Run("no missing keys", func(t *testing.T) {
+		m := map[string]interface{}{
+			"apple":  1,
+			"banana": 2,
+			"cherry": 3,
+		}
+		keys := []string{"apple", "banana", "cherry"}
+		err := CheckMissingKeys(m, keys)
+		if err != nil {
+			t.Errorf("expected no error, got %v", err)
+		}
+	})
+
+	t.Run("empty key list", func(t *testing.T) {
+		m := map[string]interface{}{
+			"apple": 1,
+		}
+		keys := []string{}
+		err := CheckMissingKeys(m, keys)
+		if err != nil {
+			t.Errorf("expected no error for empty key list, got %v", err)
+		}
+	})
+
+	t.Run("empty map", func(t *testing.T) {
+		m := map[string]interface{}{}
+		keys := []string{"a", "b"}
+		err := CheckMissingKeys(m, keys)
+		if err == nil {
+			t.Error("expected an error for missing keys, got nil")
+		} else {
+			expectedErr := "missing keys: a, b"
+			if err.Error() != expectedErr {
+				t.Errorf("expected error '%s', got '%s'", expectedErr, err.Error())
+			}
+		}
+	})
+}

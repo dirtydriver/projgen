@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"reflect"
-	"slices"
+	"errors"
+	"strings"
 )
 
 // RemoveDuplicates returns a new slice containing unique elements from the input slice.
@@ -20,27 +20,17 @@ func RemoveDuplicates(list []string) []string {
 	return uniqElements
 }
 
-// ValidateParameters checks if two parameter lists contain the same elements (order-independent).
-func ValidateParameters(ParamList, TemplateParamList *[]string) bool {
-
-	slices.Sort(*ParamList)
-	slices.Sort(*TemplateParamList)
-
-	return reflect.DeepEqual(*ParamList, *TemplateParamList)
-}
-
-// CollectMissingParameters returns a slice of parameters that are in TemplateParamList but not in ParamList.
-func CollectMissingParameters(ParamList, TemplateParamList *[]string) []string {
-
-	var missingParams []string
-	for _, param := range *TemplateParamList {
-		if !slices.Contains(*ParamList, param) {
-
-			missingParams = append(missingParams, param)
+// CheckMissingKeys verifies that all required keys in the list exist in the given map.
+// It returns an error listing any missing keys, or nil if all keys are present.
+func CheckMissingKeys(m map[string]interface{}, list []string) error {
+	var missing []string
+	for _, key := range list {
+		if _, found := m[key]; !found {
+			missing = append(missing, key)
 		}
-
 	}
-
-	return missingParams
-
+	if len(missing) > 0 {
+		return errors.New("missing keys: " + strings.Join(missing, ", "))
+	}
+	return nil
 }
