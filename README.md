@@ -1,4 +1,4 @@
-# RepoForge
+# projgen
 
 A powerful and flexible project generator CLI tool written in Go that helps you quickly scaffold new projects from templates.
 
@@ -15,78 +15,74 @@ A powerful and flexible project generator CLI tool written in Go that helps you 
 ### From Source
 ```bash
 # Clone the repository
-git clone https://github.com/dirtydriver/RepoForge.git
-cd RepoForge
+git clone https://github.com/dirtydriver/projgen.git
+cd projgen
 
-# Download dependencies
-make deps
-
-# Build the binary
-make build
-
-# The binary will be available in the bin directory
+# Build and install
+go install
 ```
 
 ### Via Go Install
 ```bash
-go install github.com/dirtydriver/RepoForge@latest
+go install github.com/dirtydriver/projgen@latest
 ```
-
-## Development
-
-RepoForge uses Make for common development tasks:
-
-- `make build`: Build the binary
-- `make test`: Run unit tests
-- `make fmt`: Format code
-- `make lint`: Run linter (requires golint)
-- `make vet`: Run static analysis
-- `make clean`: Clean build artifacts
 
 ## Usage
 
-### Basic Usage
+projgen follows Unix-style command structure with subcommands. Two flags are required for all operations:
+- `--template-dir`: Path to the template directory
+- `--type`: Type of project (e.g., maven, gradle, angular)
+
+### Available Commands
 
 ```bash
-projgen --type <project-type> --name <project-name> [flags]
+# Generate a new project
+projgen --template-dir <dir> --type <type> generate [flags]
+
+# Inspect template parameters
+projgen --template-dir <dir> --type <type> inspect
+
+# Show version
+projgen version
 ```
 
-### Available Flags
+### Generate Command Flags
 
-- `-t, --type`: Type of project (e.g., maven, gradle, angular)
-- `-n, --name`: Name of the project
+- `-n, --name`: Name of the project (can also be provided via --parameter name=value)
 - `-o, --out`: Output directory (default: current directory)
 - `-p, --parameter`: Additional parameters in key=value format (can be used multiple times)
 - `-f, --file`: Path to a parameters file
-- `--get-template-params`: List the parameters required by the template
-- `--template-dir`: Path to the template directory
-- `--template-file`: Path to the template file to inspect
 
 ### Examples
 
 1. Generate a new project:
 ```bash
-projgen -t maven -n my-project
+projgen --template-dir ./templates --type maven generate --name my-project
 ```
 
 2. Generate with custom parameters:
 ```bash
-projgen -t angular -n my-app -p version=1.0.0 -p author="John Doe"
+projgen --template-dir ./templates --type angular generate \
+  --parameter name=my-app \
+  --parameter version=1.0.0 \
+  --parameter author="John Doe"
 ```
 
 3. Use a parameters file:
 ```bash
-projgen -t gradle -n my-lib -f params.file
+projgen --template-dir ./templates --type gradle generate \
+  --name my-lib \
+  --file params.file
 ```
 
 4. Check template parameters:
 ```bash
-projgen --get-template-params -t maven --template-dir ./templates
+projgen --template-dir ./templates --type maven inspect
 ```
 
 ## Template System
 
-RepoForge uses a powerful templating system that allows you to create and customize project templates. Templates are stored in the `templates` directory and use the `.tmpl` extension.
+projgen uses a powerful templating system that allows you to create and customize project templates. Templates are stored in the `templates` directory and use the `.tmpl` extension.
 
 ### Template Structure
 ```
@@ -101,9 +97,27 @@ templates/
     └── ...
 ```
 
+### Go Template Syntax
+projgen uses Go's built-in template engine. For detailed documentation, visit the [official text/template package documentation](https://pkg.go.dev/text/template).
+
+Common template syntax used in project generation:
+```
+{{.name}}           # Access a parameter value
+{{.group_id}}       # Use snake_case for parameter names
+{{if .test}}        # Conditional block
+  {{.test}}
+{{end}}
+{{range .items}}    # Loop through array/slice
+  {{.}}
+{{end}}
+{{$var := .name}}   # Assign to variable
+{{title .name}}     # Use 'title' function to capitalize
+```
+
 ### Parameter Files
 You can create parameter files to store commonly used values. Parameter files use a simple key=value format:
 ```
+name=my-project
 version=1.0.0
 author=John Doe
 description=My awesome project
@@ -113,25 +127,30 @@ description=My awesome project
 1. Create a new directory in `templates/` for your project type
 2. Add template files with the `.tmpl` extension
 3. Use Go template syntax for variable substitution: `{{.variable_name}}`
-4. Variables will be populated from command line parameters or parameter files
+4. Use `projgen inspect` to check required parameters
 
 ## Project Structure
 
 ```
-RepoForge/
+projgen/
 ├── cmd/          # Command line interface implementation
 ├── filescheck/   # File system operations and checks
 ├── project/      # Project generation logic
 ├── templater/    # Template processing and rendering
-├── templates/    # Project templates
 ├── utils/        # Utility functions
-└── bin/          # Compiled binaries
+└── version/      # Version information
 ```
+
+## Development
+
+To contribute to projgen:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## License
 
 This project is licensed under the terms of the LICENSE file included in the repository.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
