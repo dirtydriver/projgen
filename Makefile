@@ -27,6 +27,11 @@ test:
 	@echo "Running tests..."
 	go test -v ./...
 
+# Run unit tests.
+cover:
+	@echo "Running Coverage..."
+	go test -cover ./...
+
 # Format the Go source files.
 fmt:
 	@echo "Formatting code..."
