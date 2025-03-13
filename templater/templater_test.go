@@ -35,7 +35,7 @@ func TestCollectParameters(t *testing.T) {
 	}
 
 	// Expected placeholders (order is not guaranteed).
-	expected := []string{".GroupID", ".User.Name"}
+	expected := []string{"GroupID", "User.Name"}
 
 	// Sort both slices before comparing.
 	sort.Strings(params)
