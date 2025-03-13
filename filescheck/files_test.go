@@ -77,7 +77,7 @@ func TestCopyFiles(t *testing.T) {
 	}
 
 	// Call CopyFiles to copy the file to destDir.
-	if err := CopyFiles([]string{srcFile}, destDir); err != nil {
+	if err := CopyFile(srcFile, destDir); err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
