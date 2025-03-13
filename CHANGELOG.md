@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.2](https://github.com/dirtydriver/projgen/compare/v1.0.1...v1.0.2) (2025-03-13)
+
+
+### Bug Fixes
+
+* change Version to var from const ([7e5895b](https://github.com/dirtydriver/projgen/commit/7e5895be0a82794a32c47819ef49a84bf723e65d))
+
 ## [1.0.1](https://github.com/dirtydriver/projgen/compare/v1.0.0...v1.0.1) (2025-03-13)
 
 
