@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/dirtydriver/projgen/compare/v1.0.0...v1.0.1) (2025-03-13)
+
+
+### Bug Fixes
+
+* fix version command output ([00d4f93](https://github.com/dirtydriver/projgen/commit/00d4f93b8d6da77c86178713a26aa23b404bf4e1))
+
 ## 1.0.0 (2025-03-13)
 
 
