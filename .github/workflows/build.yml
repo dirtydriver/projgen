@@ -58,9 +58,9 @@ jobs:
 
       - name: Build Release Binaries
         run: |
-          GOOS=linux GOARCH=amd64 go build -o projgen-linux-amd64
-          GOOS=windows GOARCH=amd64 go build -o projgen-windows-amd64.exe
-          GOOS=darwin GOARCH=amd64 go build -o projgen-darwin-amd64
+          GOOS=linux GOARCH=amd64 go build -ldflags="-X 'github.com/dirtydriver/projgen/version.Version=${{ needs.release-please.outputs.tag_name }}'" -o projgen-linux-amd64
+          GOOS=windows GOARCH=amd64 go build -ldflags="-X 'github.com/dirtydriver/projgen/version.Version=${{ needs.release-please.outputs.tag_name }}'" -o projgen-windows-amd64.exe
+          GOOS=darwin GOARCH=amd64 go build -ldflags="-X 'github.com/dirtydriver/projgen/version.Version=${{ needs.release-please.outputs.tag_name }}'" -o projgen-darwin-amd64
 
       - name: Upload Release Artifacts
         env:
