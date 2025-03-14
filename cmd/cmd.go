@@ -34,10 +34,6 @@ func getRootCmd() *cobra.Command {
 	rootCmd.PersistentFlags().StringVar(&templateDir, "template-dir", "", "Path to the template directory")
 	rootCmd.PersistentFlags().StringVarP(&projectType, "type", "t", "", "Type of project (e.g. maven, gradle, angular)")
 
-	// Mark required persistent flags
-	rootCmd.MarkPersistentFlagRequired("template-dir")
-	rootCmd.MarkPersistentFlagRequired("type")
-
 	// Add all subcommands
 	rootCmd.AddCommand(
 		getVersionCmd(),
@@ -52,6 +48,15 @@ func getGenerateCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "generate",
 		Short: "Generate a new project from a template",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if templateDir == "" {
+				return fmt.Errorf("required flag \"template-dir\" not set")
+			}
+			if projectType == "" {
+				return fmt.Errorf("required flag \"type\" not set")
+			}
+			return nil
+		},
 		Run: func(cmd *cobra.Command, args []string) {
 			// Collect additional parameters passed via --parameter flags
 			paramsMap := make(map[string]interface{})
@@ -112,6 +117,15 @@ func getInspectCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "inspect",
 		Short: "Inspect template parameters and requirements",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if templateDir == "" {
+				return fmt.Errorf("required flag \"template-dir\" not set")
+			}
+			if projectType == "" {
+				return fmt.Errorf("required flag \"type\" not set")
+			}
+			return nil
+		},
 		Run: func(cmd *cobra.Command, args []string) {
 			templatePath := path.Join(templateDir, projectType)
 			files, err := filescheck.FindTemplateFiles(templatePath, "tmpl")
