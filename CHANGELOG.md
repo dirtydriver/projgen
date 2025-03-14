@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/dirtydriver/projgen/compare/v1.0.2...v1.0.3) (2025-03-14)
+
+
+### Bug Fixes
+
+* remove required flags in version command ([44ec5c3](https://github.com/dirtydriver/projgen/commit/44ec5c3b41c61afa5520b4e239329e1c8e1610db))
+
 ## [1.0.2](https://github.com/dirtydriver/projgen/compare/v1.0.1...v1.0.2) (2025-03-13)
 
 
