@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.4](https://github.com/dirtydriver/projgen/compare/v1.0.3...v1.0.4) (2025-03-19)
+
+
+### Bug Fixes
+
+* fix Generate function and remove unnecessary parameter check ([cc14002](https://github.com/dirtydriver/projgen/commit/cc1400200be4d2599b6dedec43415eab4462c82a))
+
 ## [1.0.3](https://github.com/dirtydriver/projgen/compare/v1.0.2...v1.0.3) (2025-03-14)
 
 
