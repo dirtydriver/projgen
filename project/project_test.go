@@ -45,12 +45,11 @@ func TestGenerate(t *testing.T) {
 
 	// Prepare parameters for the Generate function.
 	params := map[string]interface{}{
-		"type": projectType,
 		"Name": "World",
 	}
 
 	// Call the Generate function.
-	if err := Generate(templateDir, outputDir, params); err != nil {
+	if err := Generate(projectTemplateDir, outputDir, params); err != nil {
 		t.Fatalf("Generate returned error: %v", err)
 	}
 

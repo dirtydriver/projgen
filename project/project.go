@@ -1,7 +1,6 @@
 package project
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -14,26 +13,15 @@ import (
 // Generate creates a new project from a template directory using the provided parameters.
 // It copies all files from the template, rendering any .tmpl files with the given parameters.
 func Generate(templateDir, outputDir string, paramsMap map[string]interface{}) error {
-	// Validate and extract the project type.
-	projectTypeVal, ok := paramsMap["type"]
-	if !ok {
-		return errors.New("missing 'type' parameter")
-	}
-	projectType, ok := projectTypeVal.(string)
-	if !ok {
-		return errors.New("'type' parameter is not a string")
-	}
 
-	// Construct the path to the project's templates.
-	templatePath := filepath.Join(templateDir, projectType)
-	fileList, err := filescheck.FilesInDirectories(templatePath)
+	fileList, err := filescheck.FilesInDirectories(templateDir)
 	if err != nil {
 		return err
 	}
 
 	for _, file := range fileList {
 		// Compute the relative path from the template directory.
-		relPath, err := filepath.Rel(templatePath, file)
+		relPath, err := filepath.Rel(templateDir, file)
 		if err != nil {
 			return fmt.Errorf("failed to determine relative path for %s: %w", file, err)
 		}
