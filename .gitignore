@@ -8,7 +8,7 @@
 *.so
 *.dylib
 bin/
-templates_test_files/
+templates/
 .vscode/
 # Test binary, built with `go test -c`
 *.test
