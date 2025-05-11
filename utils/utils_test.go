@@ -99,3 +99,84 @@ func TestCheckMissingKeys(t *testing.T) {
 		}
 	})
 }
+
+func TestApplyOverrides(t *testing.T) {
+	tests := []struct {
+		name      string
+		initial   map[string]interface{}
+		overrides []string
+		expected  map[string]interface{}
+	}{
+		{
+			name:      "simple key-value",
+			initial:   map[string]interface{}{},
+			overrides: []string{"name=John"},
+			expected: map[string]interface{}{
+				"name": "John",
+			},
+		},
+		{
+			name: "nested keys",
+			initial: map[string]interface{}{
+				"existing": "value",
+			},
+			overrides: []string{"config.port=8080", "config.host=localhost"},
+			expected: map[string]interface{}{
+				"existing": "value",
+				"config": map[string]interface{}{
+					"port": "8080",
+					"host": "localhost",
+				},
+			},
+		},
+		{
+			name: "override existing value",
+			initial: map[string]interface{}{
+				"name": "Old",
+			},
+			overrides: []string{"name=New"},
+			expected: map[string]interface{}{
+				"name": "New",
+			},
+		},
+		{
+			name:    "deep nesting",
+			initial: map[string]interface{}{},
+			overrides: []string{
+				"a.b.c.d=value",
+				"a.b.x=1",
+				"a.y=2",
+			},
+			expected: map[string]interface{}{
+				"a": map[string]interface{}{
+					"b": map[string]interface{}{
+						"c": map[string]interface{}{
+							"d": "value",
+						},
+						"x": "1",
+					},
+					"y": "2",
+				},
+			},
+		},
+		{
+			name:      "invalid format ignored",
+			initial:   map[string]interface{}{},
+			overrides: []string{"invalid", "name=John", "=value", "key="},
+			expected: map[string]interface{}{
+				"name": "John",
+				"key":  "",
+				"":     "value",
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ApplyOverrides(tt.initial, tt.overrides)
+			if !reflect.DeepEqual(tt.initial, tt.expected) {
+				t.Errorf("ApplyOverrides() = %v; want %v", tt.initial, tt.expected)
+			}
+		})
+	}
+}

@@ -7,7 +7,40 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"sigs.k8s.io/yaml"
 )
+
+// ReadParamsFromYaml reads and parses a YAML file into a map of parameters.
+// It takes a path to a YAML file and a pointer to a map where the parameters will be stored.
+//
+// Parameters:
+//   - paramFilePath: The path to the YAML file to read
+//   - paramsMap: A pointer to a map[string]interface{} where the parsed YAML data will be stored
+//
+// Returns:
+//   - error: nil if successful, otherwise returns an error if:
+//   - The file cannot be read
+//   - The YAML content is invalid or cannot be unmarshaled
+//
+// Example YAML file content:
+//
+//	name: myproject
+//	version: 1.0.0
+//	settings:
+//	  port: 8080
+//	  host: localhost
+func ReadParamsFromYaml(paramFilePath string, paramsMap *map[string]interface{}) error {
+	data, err := os.ReadFile(paramFilePath)
+	if err != nil {
+		return err
+	}
+
+	if err := yaml.Unmarshal(data, paramsMap); err != nil {
+		return err
+	}
+	return nil
+}
 
 // ReadParamsFromFile reads parameters from a file and updates the provided parameters map.
 // It expects parameters in key=value format, ignoring empty lines and comments starting with #.
