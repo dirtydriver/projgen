@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/dirtydriver/projgen/compare/v1.0.4...v1.1.0) (2025-05-11)
+
+
+### Features
+
+* extend parameter check with nested key check and cover with tests ([233ebff](https://github.com/dirtydriver/projgen/commit/233ebffe93b3220e960cb071423e3dd9f9686148))
+* implement project generation with YAML parameter support and template rendering ([e3471d6](https://github.com/dirtydriver/projgen/commit/e3471d6d6448ba35efa8c72ffa8b3d31f0a20ab3))
+
 ## [1.0.4](https://github.com/dirtydriver/projgen/compare/v1.0.3...v1.0.4) (2025-03-19)
 
 
