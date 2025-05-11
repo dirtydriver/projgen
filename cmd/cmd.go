@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/dirtydriver/projgen/filescheck"
 	"github.com/dirtydriver/projgen/project"
@@ -60,28 +59,18 @@ func getGenerateCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			// Collect additional parameters passed via --parameter flags
 			paramsMap := make(map[string]interface{})
-			for _, p := range parameters {
-				parts := strings.SplitN(p, "=", 2)
-				if len(parts) != 2 {
-					log.Fatalf("Invalid parameter format: %s. Expected key=value", p)
-				}
-				key, value := parts[0], parts[1]
-				paramsMap[key] = value
-			}
 
 			if parametersFile != "" {
-				if err := filescheck.ReadParamsFromFile(parametersFile, &paramsMap); err != nil {
+				if err := filescheck.ReadParamsFromYaml(parametersFile, &paramsMap); err != nil {
 					log.Fatal(err.Error())
 				}
 			}
 
-			// Add projectName to params if provided
-			if projectName != "" {
-				paramsMap["name"] = projectName
-			}
-
+			utils.ApplyOverrides(paramsMap, parameters)
 			templatePath := path.Join(templateDir, projectType)
+
 			files, err := filescheck.FindTemplateFiles(templatePath, "tmpl")
+
 			if err != nil {
 				log.Fatalf("Error collecting template files: %v", err)
 			}

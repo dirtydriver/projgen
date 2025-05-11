@@ -115,12 +115,19 @@ Common template syntax used in project generation:
 ```
 
 ### Parameter Files
-You can create parameter files to store commonly used values. Parameter files use a simple key=value format:
-```
-name=my-project
-version=1.0.0
-author=John Doe
-description=My awesome project
+You can create parameter files to store commonly used values. Parameter files use YAML format:
+```yaml
+name: my-project
+version: 1.0.0
+author: John Doe
+description: My awesome project
+# You can also use nested structures
+metadata:
+  team: backend
+  priority: high
+dependencies:
+  - mysql
+  - redis
 ```
 
 ### Creating Custom Templates
