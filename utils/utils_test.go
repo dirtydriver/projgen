@@ -74,6 +74,68 @@ func TestCheckMissingKeys(t *testing.T) {
 		}
 	})
 
+	t.Run("all keys present - simple", func(t *testing.T) {
+		m := map[string]interface{}{
+			"apple":  1,
+			"banana": 2,
+			"cherry": 3,
+		}
+		keys := []string{"apple", "banana", "cherry"}
+		err := CheckMissingKeys(m, keys)
+		if err != nil {
+			t.Errorf("expected no error, got %v", err)
+		}
+	})
+
+	t.Run("nested keys present", func(t *testing.T) {
+		m := map[string]interface{}{
+			"project": map[string]interface{}{
+				"name": "test",
+				"version": "1.0.0",
+			},
+			"maven": map[string]interface{}{
+				"groupId": "com.example",
+			},
+		}
+		keys := []string{"project.name", "project.version", "maven.groupId"}
+		err := CheckMissingKeys(m, keys)
+		if err != nil {
+			t.Errorf("expected no error, got %v", err)
+		}
+	})
+
+	t.Run("missing nested keys", func(t *testing.T) {
+		m := map[string]interface{}{
+			"project": map[string]interface{}{
+				"name": "test",
+			},
+		}
+		keys := []string{"project.name", "project.version", "maven.groupId"}
+		err := CheckMissingKeys(m, keys)
+		if err == nil {
+			t.Error("expected an error for missing nested keys, got nil")
+		} else {
+			expectedErr := "missing keys: project.version, maven.groupId"
+			if err.Error() != expectedErr {
+				t.Errorf("expected error '%s', got '%s'", expectedErr, err.Error())
+			}
+		}
+	})
+
+	t.Run("yaml style map", func(t *testing.T) {
+		m := map[string]interface{}{
+			"teamcity": map[interface{}]interface{}{
+				"repositoryName": "test-repo",
+				"projectName":    "test-project",
+			},
+		}
+		keys := []string{"teamcity.repositoryName", "teamcity.projectName"}
+		err := CheckMissingKeys(m, keys)
+		if err != nil {
+			t.Errorf("expected no error, got %v", err)
+		}
+	})
+
 	t.Run("empty key list", func(t *testing.T) {
 		m := map[string]interface{}{
 			"apple": 1,
@@ -98,6 +160,75 @@ func TestCheckMissingKeys(t *testing.T) {
 			}
 		}
 	})
+}
+
+func TestHasNestedKey(t *testing.T) {
+	tests := []struct {
+		name     string
+		m        map[string]interface{}
+		path     []string
+		expected bool
+	}{
+		{
+			name: "simple key exists",
+			m: map[string]interface{}{
+				"key": "value",
+			},
+			path:     []string{"key"},
+			expected: true,
+		},
+		{
+			name: "nested key exists",
+			m: map[string]interface{}{
+				"parent": map[string]interface{}{
+					"child": "value",
+				},
+			},
+			path:     []string{"parent", "child"},
+			expected: true,
+		},
+		{
+			name: "yaml style map",
+			m: map[string]interface{}{
+				"config": map[interface{}]interface{}{
+					"setting": "value",
+				},
+			},
+			path:     []string{"config", "setting"},
+			expected: true,
+		},
+		{
+			name: "key does not exist",
+			m: map[string]interface{}{
+				"key": "value",
+			},
+			path:     []string{"nonexistent"},
+			expected: false,
+		},
+		{
+			name: "nested key does not exist",
+			m: map[string]interface{}{
+				"parent": map[string]interface{}{},
+			},
+			path:     []string{"parent", "child"},
+			expected: false,
+		},
+		{
+			name: "empty path",
+			m:        map[string]interface{}{},
+			path:     []string{},
+			expected: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := hasNestedKey(tt.m, tt.path)
+			if got != tt.expected {
+				t.Errorf("hasNestedKey() = %v, want %v", got, tt.expected)
+			}
+		})
+	}
 }
 
 func TestApplyOverrides(t *testing.T) {
