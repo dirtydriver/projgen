@@ -97,6 +97,7 @@ func TestCollectParametersInvalidTemplate(t *testing.T) {
 	}
 }
 
+// TestRenderTemplate checks basic template rendering functionality.
 func TestRenderTemplate(t *testing.T) {
 	// Define the template content.
 	templateContent := "Hello, {{.Name}}! Welcome to {{.Project}}."
@@ -135,6 +136,147 @@ func TestRenderTemplate(t *testing.T) {
 	// Compare the rendered output with the expected result.
 	if output.String() != expected {
 		t.Errorf("expected output %q, got %q", expected, output.String())
+	}
+}
+
+// TestRenderTemplateWithSprigFunctions tests template rendering with Sprig functions.
+func TestRenderTemplateWithSprigFunctions(t *testing.T) {
+	tests := []struct {
+		name           string
+		templateContent string
+		params         map[string]interface{}
+		expected       string
+	}{
+		{
+			name:           "Upper function",
+			templateContent: "{{.name | upper}}",
+			params:         map[string]interface{}{"name": "john"},
+			expected:       "JOHN",
+		},
+		{
+			name:           "Title function",
+			templateContent: "{{.name | title}}",
+			params:         map[string]interface{}{"name": "john doe"},
+			expected:       "John Doe",
+		},
+		{
+			name:           "Default function",
+			templateContent: "{{.name | default \"Anonymous\"}}",
+			params:         map[string]interface{}{},
+			expected:       "Anonymous",
+		},
+		{
+			name:           "Date formatting",
+			templateContent: "{{now | date \"2006-01-02\"}}",
+			params:         map[string]interface{}{},
+			expected:       "", // We'll check this separately since date changes
+		},
+		{
+			name:           "String operations",
+			templateContent: "{{.text | trim | repeat 2}}",
+			params:         map[string]interface{}{"text": " hello "},
+			expected:       "hellohello",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a temporary file for the template.
+			tmpFile, err := os.CreateTemp("", "template-*.txt")
+			if err != nil {
+				t.Fatalf("failed to create temporary file: %v", err)
+			}
+			defer os.Remove(tmpFile.Name())
+
+			// Write the template content to the file.
+			if _, err := tmpFile.WriteString(tt.templateContent); err != nil {
+				t.Fatalf("failed to write to temporary file: %v", err)
+			}
+			if err := tmpFile.Close(); err != nil {
+				t.Fatalf("failed to close temporary file: %v", err)
+			}
+
+			// Render the template
+			output, err := RenderTemplate(tmpFile.Name(), tt.params)
+			if err != nil {
+				t.Fatalf("RenderTemplate returned an error: %v", err)
+			}
+
+			// For date test, we need a special check
+			if tt.name == "Date formatting" {
+				// Just check that we got something with the right format (yyyy-mm-dd)
+				if len(output.String()) != 10 || output.String()[4] != '-' || output.String()[7] != '-' {
+					t.Errorf("expected date format YYYY-MM-DD, got %q", output.String())
+				}
+			} else if output.String() != tt.expected {
+				t.Errorf("expected output %q, got %q", tt.expected, output.String())
+			}
+		})
+	}
+}
+
+// TestRenderTemplateErrors tests error handling in RenderTemplate function.
+func TestRenderTemplateErrors(t *testing.T) {
+	tests := []struct {
+		name           string
+		templateContent string
+		params         map[string]interface{}
+		expectError    bool
+	}{
+		{
+			name:           "Invalid template syntax",
+			templateContent: "{{ .Name }",  // Missing closing bracket
+			params:         map[string]interface{}{"Name": "John"},
+			expectError:    true,
+		},
+		{
+			name:           "Invalid function call",
+			templateContent: "{{ .Name | nonExistentFunction }}",
+			params:         map[string]interface{}{"Name": "John"},
+			expectError:    true,
+		},
+		{
+			name:           "Execution error",
+			templateContent: "{{ index .Items 0 }}",  // Accessing non-existent slice
+			params:         map[string]interface{}{"Name": "John"},
+			expectError:    true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			// Create a temporary file for the template.
+			tmpFile, err := os.CreateTemp("", "template-*.txt")
+			if err != nil {
+				t.Fatalf("failed to create temporary file: %v", err)
+			}
+			defer os.Remove(tmpFile.Name())
+
+			// Write the template content to the file.
+			if _, err := tmpFile.WriteString(tt.templateContent); err != nil {
+				t.Fatalf("failed to write to temporary file: %v", err)
+			}
+			if err := tmpFile.Close(); err != nil {
+				t.Fatalf("failed to close temporary file: %v", err)
+			}
+
+			// Render the template
+			_, err = RenderTemplate(tmpFile.Name(), tt.params)
+			
+			if tt.expectError && err == nil {
+				t.Errorf("expected error, got nil")
+			} else if !tt.expectError && err != nil {
+				t.Errorf("did not expect error, got %v", err)
+			}
+		})
+	}
+}
+
+// TestRenderTemplateNonExistentFile tests the behavior when trying to render a non-existent template file.
+func TestRenderTemplateNonExistentFile(t *testing.T) {
+	_, err := RenderTemplate("non-existent-file.tmpl", nil)
+	if err == nil {
+		t.Errorf("expected error for non-existent file, got nil")
 	}
 }
 

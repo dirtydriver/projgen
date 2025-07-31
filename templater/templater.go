@@ -10,6 +10,7 @@ import (
 	"text/template"
 	"text/template/parse"
 
+	"github.com/Masterminds/sprig/v3"
 	"github.com/dirtydriver/projgen/utils"
 )
 
@@ -97,9 +98,12 @@ func CollectParameters(tempFiles []string) ([]string, error) {
 }
 
 // RenderTemplate processes a template file with the given parameters and returns the rendered content.
+// It supports all standard Go template functionality plus Sprig template functions (http://masterminds.github.io/sprig/).
+// This enables advanced template features like string manipulation, date formatting, math operations, and more.
+// Examples of Sprig functions include: upper, lower, title, trim, default, date, repeat, etc.
 func RenderTemplate(file string, params map[string]interface{}) (bytes.Buffer, error) {
 	// Parse the template file
-	tmpl, err := template.ParseFiles(file)
+	tmpl, err := template.New(filepath.Base(file)).Funcs(sprig.TxtFuncMap()).ParseFiles(file)
 	if err != nil {
 		return bytes.Buffer{}, err // Return the error immediately
 	}
