@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.0](https://github.com/dirtydriver/projgen/compare/v1.1.0...v1.2.0) (2025-07-31)
+
+
+### Features
+
+* extend with templater function like upper,lower ([6e5d823](https://github.com/dirtydriver/projgen/commit/6e5d823a0ebda830f761ff859450eb43e3b74f58))
+
 ## [1.1.0](https://github.com/dirtydriver/projgen/compare/v1.0.4...v1.1.0) (2025-05-11)
 
 
