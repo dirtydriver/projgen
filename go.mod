@@ -1,6 +1,6 @@
 module github.com/dirtydriver/projgen
 
-go 1.22.0
+go 1.25.4
 
 require (
 	github.com/spf13/cobra v1.8.1
