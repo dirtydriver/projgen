@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/dirtydriver/projgen/compare/v1.2.0...v1.2.1) (2025-11-19)
+
+
+### Bug Fixes
+
+* change log handling to pass to new version of go tests ([c2b0492](https://github.com/dirtydriver/projgen/commit/c2b04929e74e937d1984b55a0915af40ead2a356))
+* update Go toolchain to 1.25.4 ([ca21840](https://github.com/dirtydriver/projgen/commit/ca21840c24537a1d1c2fe155cab880493a080b04))
+
 ## [1.2.0](https://github.com/dirtydriver/projgen/compare/v1.1.0...v1.2.0) (2025-07-31)
 
 
