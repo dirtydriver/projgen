@@ -77,12 +77,12 @@ func getGenerateCmd() *cobra.Command {
 
 			params, err := templater.CollectParameters(files)
 			if err != nil {
-				log.Fatalf(err.Error())
+				log.Fatalf("Error collecting parameters: %v", err)
 			}
 
 			err = utils.CheckMissingKeys(paramsMap, params)
 			if err != nil {
-				log.Fatalf(err.Error())
+				log.Fatalf("Error checking missing keys: %v", err)
 			}
 
 			err = project.Generate(templatePath, outputDir, paramsMap)
@@ -124,7 +124,7 @@ func getInspectCmd() *cobra.Command {
 
 			params, err := templater.CollectParameters(files)
 			if err != nil {
-				log.Fatalf(err.Error())
+				log.Fatalf("Error collecting parameters: %v", err)
 			}
 
 			fmt.Println("Template requires the following parameters:")
